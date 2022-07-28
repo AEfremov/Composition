@@ -7,12 +7,21 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import ru.efremov.composition.R
 import ru.efremov.composition.databinding.FragmentGameBinding
+import ru.efremov.composition.domain.entity.GameResult
+import ru.efremov.composition.domain.entity.Level
 
 class GameFragment : Fragment(R.layout.fragment_game) {
 
     private var _binding: FragmentGameBinding? = null
     private val binding: FragmentGameBinding
         get() = _binding ?: throw RuntimeException("FragmentGameBinding == null")
+
+    private lateinit var level: Level
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        parseArgs()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -23,8 +32,42 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun parseArgs() {
+        requireArguments().getParcelable<Level>(KEY_LEVEL)?.let {
+            level = it
+        }
+    }
+
+    private fun launchGameFinishedFragment(gameResult: GameResult) {
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.main_container, GameFinishedFragment.newInstance(gameResult))
+            .addToBackStack(null)
+            .commit()
+    }
+
+    companion object {
+
+        const val NAME = "GameFragment"
+
+        private const val KEY_LEVEL = "level"
+
+        fun newInstance(level: Level): GameFragment {
+            return GameFragment().apply {
+                arguments = Bundle().apply {
+                    putParcelable(KEY_LEVEL, level)
+                }
+            }
+        }
     }
 }
