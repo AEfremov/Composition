@@ -16,11 +16,11 @@ import ru.efremov.composition.domain.entity.Level
 
 class GameFragment : Fragment(R.layout.fragment_game) {
 
+    private val viewModelFactory: GameViewModelFactory by lazy {
+        GameViewModelFactory(level, requireActivity().application)
+    }
     private val viewModel: GameViewModel by lazy {
-        ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        )[GameViewModel::class.java]
+        ViewModelProvider(this, viewModelFactory)[GameViewModel::class.java]
     }
 
     private var _binding: FragmentGameBinding? = null
@@ -56,10 +56,8 @@ class GameFragment : Fragment(R.layout.fragment_game) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         observeViewModel()
         setClickListenersToOptions()
-        viewModel.startGame(level)
     }
 
     private fun observeViewModel() {
